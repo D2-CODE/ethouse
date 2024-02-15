@@ -2,6 +2,7 @@ from django.shortcuts import render, redirect
 from django.contrib.auth import logout
 from django.views import View
 from .models import *
+from django.http import JsonResponse
 
 def index(request):
     return render(request, 'index.html')
@@ -31,6 +32,9 @@ def about(request):
     return render(request, 'about.html')
 
 def register(request):
+
+    states = State.objects.all()
+
     if request.POST:
         role = request.POST.get('role')
         first_name = request.POST.get('firstName')
@@ -97,4 +101,18 @@ def register(request):
         # Redirect to a success page or wherever you want
         return redirect('login')
 
-    return render(request, 'register.html')
+    return render(request, 'register.html',{"states": states})
+
+
+def load_cities(request):
+    state_id = request.GET.get("state_id")
+    cities = City.objects.filter(state_id=state_id)
+    city_options = [{'id': city.id, 'name': city.city} for city in cities]
+    return JsonResponse(city_options, safe=False)
+
+
+def load_areas(request):
+    city_id = request.GET.get("city_id")
+    areas = Area.objects.filter(city_id=city_id)
+    area_options = [{'id': area.id, 'name': area.area, 'pincode': area.pincode} for area in areas]
+    return JsonResponse(area_options, safe=False)

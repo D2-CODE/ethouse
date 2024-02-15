@@ -12,4 +12,6 @@ urlpatterns = [
     path('property-agent/', property_agent, name='property-agent'),
     path('testimonial/', testimonial, name='testimonial'),
     path('about/', about, name='about'),
+    path('load_cities/', load_cities, name='load_cities'),
+    path('load_areas/', load_areas, name='load_areas'),
 ]

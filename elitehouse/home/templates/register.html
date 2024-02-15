@@ -78,9 +78,13 @@
                 <div class="mb-3">
                     <label for="state" class="form-label">State</label>
                     <select class="form-select" id="state" name="state" required>
-                        <option value="Gujarat">Gujarat</option>
+                        <!-- <option value="Gujarat">Gujarat</option>
                         <option value="Maharashtra">Maharashtra</option>
-                        <option value="Delhi">Delhi</option>
+                        <option value="Delhi">Delhi</option> -->
+                        <option value="">Select State</option>
+                        {% for state in states %}
+                        <option value="{{ state.id }}">{{ state.state }}</option>
+                        {% endfor %}
                     </select>
                 </div>
             </div>
@@ -90,10 +94,11 @@
                 <div class="mb-3">
                     <label for="city" class="form-label">City</label>
                     <select class="form-select" id="city" name="city" required>
-                        Options will be dynamically populated based on the selected state
+                        <!-- Options will be dynamically populated based on the selected state
                         <option value="Ahmedabad">Ahmedabad</option>
                         <option value="Surat">Surat</option>
-                        <option value="Gandhinagar">Gandhinagar</option>
+                        <option value="Gandhinagar">Gandhinagar</option> -->
+                        <option value="">Select City</option>
                     </select>
                 </div>
             </div>
@@ -101,10 +106,11 @@
                 <div class="mb-3">
                     <label for="area" class="form-label">Area</label>
                     <select class="form-select" id="area" name="area" required>
-                        Options will be dynamically populated based on the selected city
+                        <!-- Options will be dynamically populated based on the selected city
                         <option value="Thaltej">Thaltej</option>
                         <option value="Navrangpura">Navrangpura</option>
-                        <option value="Nikol">Nikol</option>
+                        <option value="Nikol">Nikol</option> -->
+                        <option value="">Select Area</option>
                     </select>
                 </div>
             </div>
@@ -136,10 +142,9 @@
             </div>
         </div>
 
-        <div class="mb-3">
+        <div class="mb-3" id="documentField">
             <label for="document" class="form-label">Upload Document</label>
-            <input type="file" class="form-control" id="document" name="document" accept="image/*"
-                onchange="previewImage(this)" required>
+            <input type="file" class="form-control" id="document" sname="document" accept="image/*">
         </div>
 
         <div class="text-center">
@@ -154,16 +159,60 @@
         var sellerRadio = document.getElementById("seller");
         var documentLabel = document.querySelector("label[for='document']");
         var documentInput = document.getElementById("document");
+        var documentField = document.getElementById("documentField");
 
         buyerRadio.addEventListener("click", function () {
             documentLabel.style.display = "none";
             documentInput.style.display = "none";
+            documentInput.removeAttribute("required");;
         });
 
         sellerRadio.addEventListener("click", function () {
             documentLabel.style.display = "block";
             documentInput.style.display = "block";
+            documentInput.setAttribute("required", "required");
         });
+
+        var stateSelect = document.querySelector('#state');
+        var citySelect = document.querySelector('#city');
+        var areaSelect = document.querySelector('#area');
+
+        stateSelect.addEventListener('change', function () {
+            var stateId = this.value;
+            console.log(stateId);
+            citySelect.innerHTML = '<option value="">Select City</option>';
+            areaSelect.innerHTML = '<option value="">Select Area</option>';
+            if (stateId) {
+                fetch(`/load_cities/?state_id=${stateId}`)
+                    .then(response => response.json())
+                    .then(data => {
+                        data.forEach(city => {
+                            var option = document.createElement('option');
+                            option.value = city.id;
+                            option.text = city.name;
+                            citySelect.add(option);
+                        });
+                    });
+            }
+        });
+
+        citySelect.addEventListener('change', function () {
+            var cityId = this.value;
+            areaSelect.innerHTML = '<option value="">Select Area</option>';
+            if (cityId) {
+                fetch(`/load_areas/?city_id=${cityId}`)
+                    .then(response => response.json())
+                    .then(data => {
+                        data.forEach(area => {
+                            var option = document.createElement('option');
+                            option.value = area.id;
+                            option.text = area.name;
+                            areaSelect.add(option);
+                        });
+                    });
+            }
+        });
+
     });
 </script>
 {% endblock %}
